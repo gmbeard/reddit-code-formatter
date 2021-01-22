@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.10)
 project(
     reddit-code-formatter
     LANGUAGES CXX
-    VERSION 0.1.0
+    VERSION 0.1.1
 )
 
 option(
