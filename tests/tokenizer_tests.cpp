@@ -1,22 +1,8 @@
 #include "reddit_code_formatter.hpp"
-#include <cassert>
+#include "./testing.hpp"
+
 #include <iterator>
-#include <stdexcept>
-#include <initializer_list>
-#include <iostream>
 #include <string>
-
-#define STRINGIFY_IMPL(x) #x
-#define STRINGIFY(x) STRINGIFY_IMPL(x)
-#define FailureMessage(cond) \
-    STRINGIFY(cond) " - " __FILE__ ":" STRINGIFY(__LINE__)
-
-#define Expect(cond)                                        \
-do {                                                        \
-    if (!(cond))                                            \
-        throw std::logic_error { FailureMessage(cond) };    \
-}                                                           \
-while (0)
 
 auto empty_data_test()
 {
@@ -81,23 +67,6 @@ auto token_content_test()
 
     token = tokenizer.consume();
     Expect(to_string(token.data) == "\t");
-}
-
-auto run_tests(std::initializer_list<auto (*)() -> void> tests)
-{
-    int result_code = 0;
-    for (auto t: tests) {
-        try {
-            t();
-        }
-        catch (std::exception const& e) {
-            std::cerr << "FAILED: " << e.what() << '\n';
-            result_code = 1;
-            break;
-        }
-    }
-
-    return result_code;
 }
 
 auto main() -> int

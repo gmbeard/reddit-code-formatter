@@ -91,6 +91,22 @@ struct Span
         return (m_data + m_length);
     }
 
+    constexpr auto subspan_to(const_iterator to) const noexcept -> Span
+    {
+        return {
+            m_data,
+            static_cast<size_type>(to - begin())
+        };
+    }
+
+    constexpr auto subspan_from(const_iterator from) const noexcept -> Span
+    {
+        return {
+            m_data + (from - begin()),
+            static_cast<size_type>(end() - from)
+        };
+    }
+
 private:
     pointer m_data { nullptr };
     size_type m_length { 0 };

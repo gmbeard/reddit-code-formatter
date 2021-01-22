@@ -1,0 +1,18 @@
+#ifndef REDDIT_CODE_FORMATTER_CONFIG_HPP_INCLUDED
+#define REDDIT_CODE_FORMATTER_CONFIG_HPP_INCLUDED
+
+#include <cstddef>
+
+namespace rcf
+{
+
+std::size_t constexpr kMajorVersion = @PROJECT_VERSION_MAJOR@;
+std::size_t constexpr kMinorVersion = @PROJECT_VERSION_MINOR@;
+std::size_t constexpr kPatchVersion = @PROJECT_VERSION_PATCH@;
+char constexpr kBinaryName[] = "@PROJECT_NAME@";
+char constexpr kVersionString[] = "@PROJECT_VERSION@@DEBUG_VERSION@";
+char constexpr kCommitHash[] = @COMMIT_HASH@;
+
+}
+
+#endif //REDDIT_CODE_FORMATTER_CONFIG_HPP_INCLUDED
