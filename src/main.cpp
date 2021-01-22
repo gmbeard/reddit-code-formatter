@@ -1,4 +1,5 @@
 #include "./reddit_code_formatter.hpp"
+#include "config.hpp"
 
 #include <algorithm>
 #include <cstddef>
@@ -9,9 +10,17 @@
 auto format(rcf::Span<char const>, std::ostream&) -> void;
 auto buffer_from_input(std::istream&) -> std::vector<char>;
 auto operator<<(std::ostream&, rcf::Span<char const>) -> std::ostream&;
+auto print_version() -> void;
 
 auto main(int argc, char const** argv) -> int
 {
+    auto cmdline = rcf::parse_cmdline({ argv, static_cast<std::size_t>(argc) });
+
+    if (cmdline.get_option("--version")) {
+        print_version();
+        return 0;
+    }
+
     (void)(argc);
     (void)(argv);
 
@@ -69,4 +78,16 @@ auto format(rcf::Span<char const> data, std::ostream& output) -> void
 
     if (last_token_type != rcf::TokenType::Newline)
         output << '\n';
+}
+
+auto print_version() -> void
+{
+    std::cout
+        << rcf::kBinaryName << " "
+        << "version " << rcf::kVersionString;
+
+    if (*rcf::kCommitHash)
+        std::cout << " " << rcf::kCommitHash;
+
+    std::cout << '\n';
 }
