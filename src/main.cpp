@@ -14,15 +14,16 @@ auto print_version() -> void;
 
 auto main(int argc, char const** argv) -> int
 {
-    auto cmdline = rcf::parse_cmdline({ argv, static_cast<std::size_t>(argc) });
+    using rcf::parse_cmdline;
+    using rcf::long_option;
+    using rcf::short_option;
 
-    if (cmdline.get_option("--version")) {
+    auto cmdline = parse_cmdline({ argv, static_cast<std::size_t>(argc) });
+
+    if (cmdline.get_option(long_option("version"), short_option('V'))) {
         print_version();
         return 0;
     }
-
-    (void)(argc);
-    (void)(argv);
 
     auto input_data = buffer_from_input(std::cin);
     format({ &input_data[0], input_data.size() }, std::cout);

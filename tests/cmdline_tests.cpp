@@ -72,11 +72,59 @@ auto complex_cmdline_test() -> void
     Expect(std::string { *options++ } == "--");
 }
 
+auto retrieve_options_test() -> void
+{
+    char const* kVals[] = {
+        "my-prog",
+        "-V",
+        "--filename",
+        "./some-file",
+        "-T2",
+        "--tabs=2",
+        "--output",
+        "-W",
+        "4",
+    };
+
+    auto cmdline = rcf::parse_cmdline(
+            { begin(kVals), std::size(kVals) },
+            [](auto opt) {
+                return
+                    std::strcmp(opt, "filename") == 0 
+                    || std::strcmp(opt, "W") == 0;
+            });
+
+    Expect(!cmdline.get_option(rcf::LongOption("version"), rcf::ShortOption('P')));
+    Expect(cmdline.get_option(rcf::ShortOption('V')));
+    Expect(cmdline.get_option(rcf::ShortOption('T')));
+    Expect(cmdline.get_option(rcf::LongOption("output")));
+    Expect(cmdline.get_option(rcf::LongOption("tabs")));
+    Expect(cmdline.get_option(rcf::LongOption("filename")));
+
+    Expect(std::string { cmdline.get_option(rcf::LongOption("filename"), true).argument() } == "./some-file");
+    Expect(std::string { cmdline.get_option(rcf::ShortOption('T'), true).argument() } == "2");
+    Expect(std::string { cmdline.get_option(rcf::LongOption("tabs"), true).argument() } == "2");
+    Expect(std::string { cmdline.get_option(rcf::ShortOption('W'), true).argument() } == "4");
+}
+
+auto retrieve_single_test() {
+    char const* kVals[] = {
+        "my-prog",
+        "--ver",
+    };
+
+    auto cmdline = rcf::parse_cmdline({ begin(kVals), std::size(kVals) });
+
+    Expect(!cmdline.get_option(rcf::LongOption("version"), rcf::ShortOption('V')));
+}
+
 auto main() -> int
 {
     return run_tests({
         empty_cmdline_test,
         simple_cmdline_test,
         complex_cmdline_test,
+        retrieve_options_test,
+        retrieve_single_test,
     });
 }

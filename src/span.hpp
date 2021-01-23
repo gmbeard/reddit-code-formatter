@@ -16,6 +16,8 @@ struct Span
     friend struct Span;
 
     using value_type = T;
+    using reference = T&;
+    using const_reference = T const&;
     using size_type = std::size_t;
     using pointer = T*;
     using const_pointer = T const*;
@@ -55,6 +57,16 @@ struct Span
         m_data { other.m_data }
     ,   m_length { other.m_length }
     { }
+
+    constexpr auto operator[](std::size_t n) noexcept -> reference
+    {
+        return *(m_data + n);
+    }
+
+    constexpr auto operator[](std::size_t n) const noexcept -> const_reference
+    {
+        return *(m_data + n);
+    }
 
     constexpr auto size() const noexcept -> size_type
     {

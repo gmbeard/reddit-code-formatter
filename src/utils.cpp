@@ -8,7 +8,7 @@ auto rcf::NoParameterOptions::operator()(char const*) const noexcept -> bool
 
 auto rcf::trim_option(char const* opt) noexcept -> char const*
 {
-    assert(opt && *opt == '-');
+    assert(opt);
     while (*opt != '\0' && *opt == '-')
         ++opt;
     
