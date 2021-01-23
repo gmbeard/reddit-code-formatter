@@ -12,7 +12,7 @@ option(
     OFF
 )
 
-set(COMMIT_HASH "\"\"")
+set(COMMIT_HASH "\"\"" FORCE)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(DEBUG_VERSION "-debug")
@@ -23,7 +23,7 @@ find_program(GIT_PROG git)
 if(NOT GIT_PROG STREQUAL "GIT_PROG-NOTFOUND")
     message(STATUS "Found git: ${GIT_PROG}")
     execute_process(
-        COMMAND ${GIT_PROG} log HEAD --pretty="%H"
+        COMMAND ${GIT_PROG} log -1 HEAD --pretty="%H"
         OUTPUT_VARIABLE COMMIT_HASH
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
