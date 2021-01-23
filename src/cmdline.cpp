@@ -68,18 +68,20 @@ auto get_long_option(
 {
     assert(opt.size() >= 1);
     auto opt_value = rcf::trim_option(opt[0]);
+    auto const long_opt_value = rcf::trim_option(long_option);
+
     auto len = std::strlen(opt_value);
     if (auto n = std::strchr(opt_value, '='); n)
         len = n - opt_value;
 
-    if (std::strlen(rcf::trim_option(long_option)) != len
-        || std::strncmp(opt_value, rcf::trim_option(long_option), len) != 0)
+    if (std::strlen(long_opt_value) != len
+        || std::strncmp(opt_value, long_opt_value, len) != 0)
         return { };
 
     if (!with_param)
         return rcf::Option { rcf::option_present };
 
-    opt_value += std::strlen(long_option);
+    opt_value += std::strlen(long_opt_value);
 
     if (*opt_value == '=')
         return rcf::Option { rcf::option_present, ++opt_value };
