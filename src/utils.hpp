@@ -1,6 +1,7 @@
 #ifndef REDDIT_CODE_FORMATTER_UTILS_HPP_INCLUDED
 #define REDDIT_CODE_FORMATTER_UTILS_HPP_INCLUDED
 
+#include "./span.hpp"
 #include <algorithm>
 #include <cassert>
 
@@ -11,7 +12,7 @@ using CmdLineIterator = char const**;
 
 struct NoParameterOptions
 {
-    auto operator()(char const*) const noexcept -> bool;
+    auto operator()(Span<char const>) const noexcept -> bool;
 };
 
 auto trim_option(char const*) noexcept -> char const*;
@@ -29,15 +30,16 @@ auto stable_partition_args(
     bool ignore_next_arg = false;
 
     for (; pos != last; ++pos) {
-        if (ignore_next_arg) {
+        assert(*pos);
+
+        if (ignore_next_arg && **pos != '-') {
             ignore_next_arg = false;
             continue;
         }
 
-        assert(*pos);
-
         if ((**pos) == '-') {
-            ignore_next_arg = option_has_parameter_predicate(trim_option(*pos));
+            ignore_next_arg =
+                option_has_parameter_predicate(char_span(trim_option(*pos)));
             continue;
         }
 

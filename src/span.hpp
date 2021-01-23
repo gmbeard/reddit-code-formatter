@@ -2,6 +2,7 @@
 #define REDDIT_CODE_FORMATTER_SPAN_HPP_INCLUDED
 
 #include <cstddef>
+#include <cstring>
 #include <type_traits>
 
 namespace rcf
@@ -119,10 +120,52 @@ struct Span
         };
     }
 
+    constexpr auto subspan(const_iterator from, const_iterator to) const noexcept -> Span
+    {
+        return {
+            m_data + (from - begin()),
+            static_cast<size_type>(to - from)
+        };
+    }
+
+    constexpr auto content_equal(Span const& other) const noexcept -> bool
+    {
+        if (!size() == other.size())
+            return false;
+
+        auto this_iter = begin();
+        auto that_iter = other.begin();
+
+        while (this_iter != end())
+            if (*this_iter++ != *that_iter++)
+                return false;
+
+        return true;
+    }
+
+    constexpr auto find(const_reference val) const noexcept -> const_iterator
+    {
+        auto iter = begin();
+        for (; iter != end(); ++iter)
+            if (*iter == val)
+                break;
+
+        return iter;
+    }
+
 private:
     pointer m_data { nullptr };
     size_type m_length { 0 };
 };
+
+template<
+    typename CharType,
+    std::enable_if_t<std::is_same<std::decay_t<CharType>, char>::value>* = nullptr
+>
+inline auto char_span(CharType* ptr) noexcept -> Span<CharType>
+{
+    return Span<CharType> { ptr, std::strlen(ptr) };
+}
 
 }
 

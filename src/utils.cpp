@@ -1,7 +1,7 @@
 #include "./utils.hpp"
 #include <cassert>
 
-auto rcf::NoParameterOptions::operator()(char const*) const noexcept -> bool
+auto rcf::NoParameterOptions::operator()(Span<char const>) const noexcept -> bool
 {
     return false;
 }

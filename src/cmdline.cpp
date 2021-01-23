@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstring>
+#include <iterator>
 
 rcf::LongOption::LongOption(char const* value) noexcept :
     m_value { value }
@@ -66,30 +67,33 @@ auto get_long_option(
         rcf::LongOption long_option,
         bool with_param) noexcept -> rcf::Option
 {
+    using rcf::char_span;
+    using rcf::Option;
+    using rcf::option_present;
+    using rcf::trim_option;
+
     assert(opt.size() >= 1);
-    auto opt_value = rcf::trim_option(opt[0]);
-    auto const long_opt_value = rcf::trim_option(long_option);
+    auto opt_value = char_span(trim_option(opt[0]));
+    auto const long_opt_value = char_span(trim_option(long_option));
 
-    auto len = std::strlen(opt_value);
-    if (auto n = std::strchr(opt_value, '='); n)
-        len = n - opt_value;
-
-    if (std::strlen(long_opt_value) != len
-        || std::strncmp(opt_value, long_opt_value, len) != 0)
+    if (!long_opt_value.content_equal(
+            opt_value.subspan(opt_value.begin(), opt_value.find('='))))
         return { };
 
     if (!with_param)
-        return rcf::Option { rcf::option_present };
+        return Option { option_present };
 
-    opt_value += std::strlen(long_opt_value);
+    if (auto equal_ch = opt_value.find('='); equal_ch != opt_value.end()) {
+        return rcf::Option {
+            option_present,
+            opt_value.subspan_from(++equal_ch).data()
+        };
+    }
 
-    if (*opt_value == '=')
-        return rcf::Option { rcf::option_present, ++opt_value };
+    if (opt.size() == 1 || *opt[1] == '-')
+        return Option { option_present };
 
-    if (opt.size() == 1)
-        return rcf::Option { rcf::option_present };
-
-    return rcf::Option { rcf::option_present, opt[1] };
+    return Option { option_present, opt[1] };
 }
 
 auto get_short_option(
@@ -97,22 +101,29 @@ auto get_short_option(
         rcf::ShortOption short_option,
         bool with_param) noexcept -> rcf::Option
 {
+    using rcf::char_span;
+    using rcf::Option;
+    using rcf::option_present;
+    using rcf::trim_option;
+    using std::next;
+
     assert(opt.size() >= 1);
-    auto opt_value = rcf::trim_option(opt[0]);
-    if (*opt_value != short_option)
+    auto opt_value = char_span(trim_option(opt[0]));
+
+    if (!opt_value.size() || opt_value[0] != short_option)
         return { };
 
     if (!with_param)
-        return rcf::Option { rcf::option_present };
+        return Option { option_present };
 
-    ++opt_value;
-    if (*opt_value)
-        return rcf::Option { rcf::option_present, opt_value };
+    opt_value = opt_value.subspan_from(next(opt_value.begin()));
+    if (opt_value.size())
+        return Option { option_present, opt_value.data() };
 
-    if (opt.size() == 1)
-        return rcf::Option { rcf::option_present };
+    if (opt.size() == 1 || *opt[1] == '-')
+        return Option { option_present };
 
-    return rcf::Option { rcf::option_present, opt[1] };
+    return Option { option_present, opt[1] };
 }
 
 auto rcf::CmdLine::get_option(

@@ -51,8 +51,8 @@ auto complex_cmdline_test() -> void
     auto partition = rcf::stable_partition_args(
         begin(kVals),
         end(kVals),
-        [](char const* opt) noexcept {
-            return std::strcmp(opt, "filename") == 0;
+        [](auto opt) noexcept {
+            return opt.content_equal(rcf::char_span("filename"));
         });
 
     auto args = begin(kVals);
@@ -88,10 +88,9 @@ auto retrieve_options_test() -> void
 
     auto cmdline = rcf::parse_cmdline(
             { begin(kVals), std::size(kVals) },
-            [](auto opt) {
-                return
-                    std::strcmp(opt, "filename") == 0 
-                    || std::strcmp(opt, "W") == 0;
+            [](auto opt) noexcept {
+                return opt.content_equal(rcf::char_span("filename"))
+                    || opt.content_equal(rcf::char_span("W"));
             });
 
     Expect(!cmdline.get_option(rcf::LongOption("version"), rcf::ShortOption('P')));
