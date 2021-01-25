@@ -130,7 +130,7 @@ struct Span
 
     constexpr auto content_equal(Span const& other) const noexcept -> bool
     {
-        if (!size() == other.size())
+        if (size() != other.size())
             return false;
 
         auto this_iter = begin();

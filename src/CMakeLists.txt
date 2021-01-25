@@ -24,7 +24,7 @@ target_compile_features(
 target_compile_options(
     ${LIB_NAME}
     PUBLIC
-    -Wall -Werror -Wextra -pedantic -Wconversion
+    -Wall -Werror -Wextra -Wpedantic -Wconversion
 )
 
 add_executable(
